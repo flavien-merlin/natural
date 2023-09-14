@@ -1,0 +1,89 @@
+# Default values for apichuck.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: 445521015129.dkr.ecr.eu-west-2.amazonaws.com/apichuck
+  pullPolicy: Always
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "1.0"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 5000
+  targetport: 5000
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations: {}
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: 
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: apichuck
+              port:
+                number: 5000
+        - path: /health
+          pathType: Prefix
+          backend:
+            service:
+              name: apichuck
+              port:
+                number: 5000
+  tls: []
+
+resources: 
+    limits:
+      cpu: 100m
+      memory: 128Mi
+
+
+autoscaling:
+  enabled: true
+  ## Production:
+  # minReplicas: 2
+  # maxReplicas: 4
+  minReplicas: 1
+  maxReplicas: 2
+  targetCPUUtilizationPercentage: 75
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
